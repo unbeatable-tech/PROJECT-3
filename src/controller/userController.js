@@ -15,10 +15,12 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Invalid request parameters,please provide details" })
         }
         const { title, name, email, phone, password, address } = user
-
-
-        if (!validator.isValidtitle(title)) {
-            return res.status(400).send({ status: false, msg: "Title is required" })
+if(!title){
+    return res.status(400).send({status:false,message:"pls add title"})
+}
+        if(!validator.isValidTitle(title)){
+            return res.status(400).send({status:false,msg:"title is invalid"})
+            
         }
 
         
@@ -40,19 +42,16 @@ const createUser = async function (req, res) {
         }
 
 
-
-        const isUserAlready = await userModel.findOne({ phone: phone, email: email, password: password })
-        if (isUserAlready) {
-            return res.status(403).send({ status: false, meassage: "same user exist" })
-        }
-        const samePhone = await userModel.findOne({ phone: phone })
-        if (samePhone) {
-            res.status(403).send({ status: false, meassage: `${phone}is already used` })
-        }
         const sameEmail = await userModel.findOne({ email: email });
         if (sameEmail) {
             return res.status(403).send({ status: false, message: `${email} is already in used` });
         }
+        
+        const samePhone = await userModel.findOne({ phone: phone })
+        if (samePhone) {
+            res.status(403).send({ status: false, meassage: `${phone} mobile no is already used` })
+        }
+        
 
 
         // name validation using regex 
@@ -61,7 +60,7 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "please enter name in valid format" })
         }
         //validating phone number of 10 digits only.
-        if (!/^[0-9]{10}$/.test(phone))
+        if (!/^([+]\d{2})?\d{10}$/.test(phone))
             return res.status(400).send({ status: false, message: "Invalid Phone number.Phone number must be of 10 digits." })
 
         //validating email using RegEx.

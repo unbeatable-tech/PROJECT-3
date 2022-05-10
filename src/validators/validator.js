@@ -12,9 +12,15 @@ const isValid = function (value) {
 const isValidRequestBody = function (requestBody) {
     return Object.keys(requestBody).length > 0
 }
-const isValidtitle=function(title){
-    return["Mr","Mrs","Miss"].indexOf(title)!=-1
+const isValidTitle=function(value){
+
+    
+    if(['Mr','Mrs',"Miss"].indexOf(value)==-1) return false; 
+
+    return true;
+
 }
 
 
-module.exports={isValid,isValidRequestBody,isValidtitle}
+
+module.exports={isValid,isValidRequestBody,isValidTitle}
