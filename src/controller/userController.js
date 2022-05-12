@@ -93,7 +93,7 @@ const createUser = async function (req, res) {
   } 
   catch (error) {
     console.log("this is the error", error);
-    res.status(500).send({ status: false, msg: error.message });
+    return res.status(500).send({ status: false, msg: error.message });
   }
 };
 
@@ -145,7 +145,7 @@ const userLogin = async function (req, res) {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send({ status: false, error: error.meassage });
+     return res.status(500).send({ status: false, error: error.meassage });
   }
 };
 

@@ -132,7 +132,7 @@ const getBooks = async function (req, res) {
       category: 1,
       reviews: 1,
       releasedAt: 1,
-    });                                           
+    });
 
     const bookDetails = bookData.sort(function (a, b) {
       if (a.title.toLowerCase() < b.title.toLowerCase()) {
@@ -142,7 +142,7 @@ const getBooks = async function (req, res) {
         return 1;
       }
       return 0;
-    }); 
+    });
     if (bookData.length > 0) {
       return res.status(200).send({
         status: true,
@@ -287,6 +287,17 @@ const updateBook = async function (req, res) {
     }
     if (!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)) {
       return res.status(400).send({ status: false, msg: "ISBN is invalid" });
+    }
+
+    /// for duplication of title and ISBN
+    const titleisUsed = await bookModel.findOne({ title: title, isDeleted: false })
+    if (titleisUsed) {
+      return res.status(400).send({ status: false, msg: `${title} is already used` })
+    }
+
+    const ISBNisUsed = await bookModel.findOne({ ISBN: ISBN, isDeleted: false })
+    if (ISBNisUsed) {
+      return res.status(400).send({ status: false, msg: `${ISBN} is already used` })
     }
 
     // Checking if book exist or not in our DB.
