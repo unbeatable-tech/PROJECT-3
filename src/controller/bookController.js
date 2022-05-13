@@ -162,19 +162,15 @@ const getBooks = async function (req, res) {
 const getbookbyId = async function (req, res) {
   try {
     let Id = req.params.bookId;
-    if (!validator.isValid(Id)) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "pls provide the book id" });
-    }
+    
     if (!validator.isValidObjectId(Id)) {
       return res
         .status(400)
         .send({ status: false, msg: "pls provide valid bookId" });
     }
 
-    let findId = await bookModel.findOne({ _id: Id, isDeleted: false });
-    if (findId) {
+    let findbook = await bookModel.findOne({ _id: Id, isDeleted: false });
+    if (findbook) {
       let { title, excerpt, userId, category, subcategory, isDeleted, reviews, deletedAt, releasedAt, createdAt, updatedAt } = findbook
 
       const reviewsData = await reviewModel.find({ bookId: Id, isDeleted: false }).select({ createdAt: 0, updatedAt: 0, __v: 0 })
