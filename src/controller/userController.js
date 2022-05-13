@@ -81,7 +81,7 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "Invalid Email id." });
 
     //setting password's mandatory length in between 8 to 15 characters.
-    if (password.length <= 8 && password.length >= 15) {
+    if (!password.length <= 8 && password.length >= 15) {
       return res
         .status(400)
         .send({ status: false, message: "Password criteria not fulfilled." });
@@ -127,7 +127,7 @@ const userLogin = async function (req, res) {
       let save = await userModel.findOne({ email: email, password: password });
       if (save) {
         let token = jwt.sign({ userId: save._id }, "project3group6", {
-          expiresIn: "24h",
+          expiresIn: "10h",
         });
         res.header("x-api-key", token);
         return res

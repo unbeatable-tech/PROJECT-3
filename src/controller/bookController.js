@@ -2,6 +2,7 @@ const bookModel = require("../model/bookModel");
 const mongoose = require("mongoose");
 const validator = require("../validators/validator");
 const moment = require("moment");
+const reviewModel = require("../model/reviewModel");
 
 const createBook = async function (req, res) {
   try {
@@ -178,9 +179,13 @@ const getbookbyId = async function (req, res) {
 
     let findId = await bookModel.findOne({ _id: Id, isDeleted: false });
     if (!findId) {
-      return res.status(400).send({ status: false, msg: "book not found" });
+      return res.status(404).send({ status: false, msg: "book not found" });
     }
-    return res.status(201).send({ status: true, msg: "success", data: findId });
+
+   let revi=await reviewModel.find({_id:Id})
+   return res.status(201).send({status:true,msg:revi})
+
+  
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, msg: error.message });
