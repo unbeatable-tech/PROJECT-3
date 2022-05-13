@@ -1,7 +1,7 @@
 const bookModel = require("../model/bookModel");
 const mongoose = require("mongoose");
 const validator = require("../validators/validator");
-const moment = require("moment");
+
 const reviewModel = require("../model/reviewModel");
 
 const createBook = async function (req, res) {
@@ -101,6 +101,8 @@ const getBooks = async function (req, res) {
   try {
     let filters = { isDeleted: false };
     let book = req.query.userId;
+
+
     if (book) {
       if (!validator.isValidObjectId(book)) {
         return res
@@ -111,18 +113,12 @@ const getBooks = async function (req, res) {
     }
     let cat = req.query.category;
     if (cat) {
-      if (!validator.isValid(cat)) {
-        return res.status(400).send({ status: false, msg: "invalid category" });
-      }
+
       filters["category"] = cat;
     }
     let subcat = req.query.sucategory;
     if (subcat) {
-      if (!validator.isValid(subcat)) {
-        return res
-          .status(400)
-          .send({ status: false, msg: "invalid subcategory" });
-      }
+
       filters["subcategory"] = subcat;
     }
     let bookData = await bookModel.find(filters).select({
@@ -178,14 +174,16 @@ const getbookbyId = async function (req, res) {
     }
 
     let findId = await bookModel.findOne({ _id: Id, isDeleted: false });
-    if (!findId) {
-      return res.status(404).send({ status: false, msg: "book not found" });
+    if (findId) {
+      let { title, excerpt, userId, category, subcategory, isDeleted, reviews, deletedAt, releasedAt, createdAt, updatedAt } = findbook
+
+      const reviewsData = await reviewModel.find({ bookId: Id, isDeleted: false }).select({ createdAt: 0, updatedAt: 0, __v: 0 })
+      const data = { title, excerpt, userId, category, subcategory, isDeleted, reviews, deletedAt, releasedAt, createdAt, updatedAt, reviewsData }
+
+      data["reviews"] = data["reviewsData"].length
+      return res.status(200).send({ status: true, messege: "Book List", Data: data })
+
     }
-
-   let revi=await reviewModel.find({_id:Id})
-   return res.status(201).send({status:true,msg:revi})
-
-  
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, msg: error.message });
