@@ -19,7 +19,7 @@ router.delete('/books/:bookId',auth1.auth, deleteBook)
 // review api
 
 router.post('/books/:bookId/review',Review.reviewData)
-router.post('/books/:bookId/review/:reviewId',Review.updateReview)
+router.put('/books/:bookId/review/:reviewId',Review.updateReview)
 router.delete('/books/:bookId/review/:reviewId',Review.deletereview)
 
 

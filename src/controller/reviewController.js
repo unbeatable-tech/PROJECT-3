@@ -175,7 +175,7 @@ const deletereview = async function (req, res) {
             return res.status(400).send({ status: false, msg: "invalid review id" })
         }
 
-        const searchBook = await reviewModel.findById({ _id: bookParams })
+        const searchBook = await bookModel.findById({ _id: bookParams })
         if (!searchBook) {
             return res.status(400).send({ status: false, msg: "book doesn't exists" })
         }

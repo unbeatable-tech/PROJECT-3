@@ -180,6 +180,9 @@ const getbookbyId = async function (req, res) {
       return res.status(200).send({ status: true, messege: "Book List", Data: data })
 
     }
+    else{
+      return res.status(400).send({status:false,msg:"book already deleted"})
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, msg: error.message });
