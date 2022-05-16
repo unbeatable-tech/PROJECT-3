@@ -127,11 +127,11 @@ const userLogin = async function (req, res) {
       let save = await userModel.findOne({ email: email, password: password });
       if (save) {
         let token = jwt.sign({ userId: save._id }, "project3group6", {
-          expiresIn: "10h",
+          expiresIn: "2hr",
         });
         res.header("x-api-key", token);
         return res
-          .status(201)
+          .status(200)
           .send({
             status: true,
             message: "you have successfully logged in",

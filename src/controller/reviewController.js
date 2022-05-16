@@ -55,7 +55,7 @@ const reviewData = async function (req, res) {
 
         const searchBook = await bookModel.findOne({ _id: Id, isDeleted: false })
         if (!searchBook) {
-            return res.status(400).send({ status: false, msg: "book is not present" })
+            return res.status(404).send({ status: false, msg: "book is not present" })
         }
         if (searchBook.isDeleted == true) {
             return res.status(400).send({ status: false, msg: "can't review because book is deleted" })
@@ -63,7 +63,7 @@ const reviewData = async function (req, res) {
 
         // save review in DB
 
-        requestBody.bookId = searchBook._id
+        requestBody['bookId'] = searchBook._id
         requestBody.reviewedAt = moment().format("YYYY-MM-DD")
 
         const saveReview = await reviewModel.create(requestBody)
@@ -124,11 +124,11 @@ const updateReview = async function (req, res) {
 
         const searchBook = await bookModel.findById({ _id: bookParams })
         if (!searchBook) {
-            return res.status(400).send({ status: false, msg: `${bookParams} book is not present` })
+            return res.status(404).send({ status: false, msg: `${bookParams} book is not present` })
         }
         const searchReview = await reviewModel.findById({ _id: reviewParams })
         if (!searchBook) {
-            return res.status(400).send({ status: false, msg: `${reviewParams} review is not present` })
+            return res.status(404).send({ status: false, msg: `${reviewParams} review is not present` })
         }
         if (searchBook.isDeleted == false) {
             if (searchReview.isDeleted == false) {
@@ -177,11 +177,11 @@ const deletereview = async function (req, res) {
 
         const searchBook = await bookModel.findById({ _id: bookParams })
         if (!searchBook) {
-            return res.status(400).send({ status: false, msg: "book doesn't exists" })
+            return res.status(404).send({ status: false, msg: "book doesn't exists" })
         }
         const searchReview = await reviewModel.findById({ _id: reviewParams })
         if (!searchReview) {
-            return res.status(400).send({ status: false, msg: "review doesn't exists" })
+            return res.status(404).send({ status: false, msg: "review doesn't exists" })
         }
 
         if (searchBook.isDeleted == false) {
