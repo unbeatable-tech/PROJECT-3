@@ -98,7 +98,9 @@ const updateReview = async function (req, res) {
 
         const { review, rating, reviewedBy } = requestupadtedBody
         // validation starts
-
+        if (!validator.isValidRequestBody(requestupadtedBody)) {
+            return res.status(400).send({ status: false, msg: "Pls provide details" })
+        }
 
         if (!validator.isValidObjectId(bookParams)) {
             return res.status(400).send({ status: false, msg: "Pls provide valid bookId" })
@@ -106,21 +108,23 @@ const updateReview = async function (req, res) {
         if (!validator.isValidObjectId(reviewParams)) {
             return res.status(400).send({ status: false, msg: "invalid reviewId" })
         }
+        if (rating)
 
-        if (!validator.isValid(rating)) {
-            return res.status(400).send({ status: false, msg: "Rating is required" })
-        }
-
-        if (!/^[1-5]{1}$/.test(rating)) {
-            return res.status(400).send({ status: false, msg: "rating must be in 1 to 5" })
-        }
-
-        if (!validator.isValid(review)) {
-            return res.status(400).send({ status: false, msg: "review is missing , pls provide review to update" })
-        }
-
-        if (!validator.isValid(reviewedBy)) {
-            return res.status(400).send({ status: false, msg: "reviewer's name  is missing , pls provide review to update" })
+            if (!/^[1-5]{1}$/.test(rating)) {
+                return res.status(400).send({ status: false, msg: "rating must be in 1 to 5,and also in valid format don't put space" })
+            }
+        if (review)
+            if (!validator.isValid(review)) {
+                return res.status(400).send({ status: false, msg: " pls provide review to update" })
+            }
+        if (reviewedBy)
+            if (!validator.isValid(reviewedBy)) {
+                return res.status(400).send({ status: false, msg: "reviewer's name  is missing , pls provide review to update" })
+            }
+        if (!/^[a-zA-Z ]{2,30}$/.test(reviewedBy)) {
+            return res
+                .status(400)
+                .send({ status: false, msg: "please enter reviewer's name in valid format" });
         }
 
 
@@ -159,24 +163,24 @@ const deletereview = async function (req, res) {
             return res.status(400).send({ status: false, msg: "invalid review id" })
         }
 
-        const searchBook = await bookModel.findOne({ _id: bookParams,isDeleted:false })
+        const searchBook = await bookModel.findOne({ _id: bookParams, isDeleted: false })
         if (!searchBook) {
             return res.status(404).send({ status: false, msg: "book doesn't exists" })
         }
-        const searchReview = await reviewModel.findOne({ _id: reviewParams,isDeleted:false  })
+        const searchReview = await reviewModel.findOne({ _id: reviewParams, isDeleted: false })
         if (!searchReview) {
             return res.status(404).send({ status: false, msg: "review doesn't exists" })
         }
 
-        
-                const delrev = await reviewModel.findOneAndUpdate({ _id: reviewParams }, { isDeleted: true, deletedAt: Date.now() }, { new: true })
 
-                if (delrev) {
-                    await bookModel.findOneAndUpdate({ _id: bookParams }, { $inc: { reviews: -1 } })
-                }
-                return res.status({ status: true, msg: "Review delted successfully", data: delrev })
-            
-       
+        const delrev = await reviewModel.findOneAndUpdate({ _id: reviewParams }, { isDeleted: true, deletedAt: Date.now() }, { new: true })
+
+        if (delrev) {
+            await bookModel.findOneAndUpdate({ _id: bookParams }, { $inc: { reviews: -1 } })
+        }
+        return res.status({ status: true, msg: "Review delted successfully", data: delrev })
+
+
 
     }
     catch (error) {
