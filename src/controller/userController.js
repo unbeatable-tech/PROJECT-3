@@ -44,14 +44,14 @@ const createUser = async function (req, res) {
     const sameEmail = await userModel.findOne({ email: email });
     if (sameEmail) {
       return res
-        .status(403)
+        .status(400)
         .send({ status: false, message: `${email} is already in used` });
     }
 
     const samePhone = await userModel.findOne({ phone: phone });
     if (samePhone) {
       res
-        .status(403)
+        .status(400)
         .send({
           status: false,
           meassage: `${phone} mobile no is already used`,

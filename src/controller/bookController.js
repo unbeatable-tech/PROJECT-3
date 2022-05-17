@@ -87,7 +87,7 @@ const createBook = async function (req, res) {
 
     const books = await bookModel.create(object);
     return res
-      .status(200)
+      .status(201)
       .send({ status: true, message: "success", data: books });
   } catch (error) {
     console.log(error);
@@ -100,82 +100,55 @@ const createBook = async function (req, res) {
 const getBooks = async function (req, res) {
 
   try {
-    if (Object.keys(req.query).length == 0) {
-      let allBooks = await bookModel.find({ isDeleted: false }).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 }).sort({ title: 1 })
-
-      if (allBooks.length == 0)
-        return res.status(404).send({ status: false, message: "No books exists" })
-      return res.status(200).send({ status: true, message: `Books List`, data: allBooks })
+    const body = req.body;
+    if(validator.isValidRequestBody(body)) {
+        return res.status(400).send({ status: false, msg: "Body must not be present"})
     }
-    else{
+    let filterObject ={ isDeleted:false }
 
-
-      let userId=req.query.userId
-      let category=req.query.category
-      let subcategory=req.query.subcategory
-
-      if(!validator.isValidObjectId(userId)){
-        return res.status(400).send({status:false,msg:"invalid userId"})
-      }
-
-      let allBooks = await bookModel.find({ $and: [{ $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] }, { isDeleted: false }] }).sort({ title: 1 })
-      .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
-
-      if (allBooks.length == 0)
-      return res.status(400).send({ status: false, message: "No books with selected query params" })
-
-      
-      res.status(200).send({ status: true, message: "Books List", data: allBooks })
+    if (validator.isValidObjectId(req.query.userId)) {
+      filterObject.userId =req.query.userId
     }
 
+    if(req.query.userId){
+
+    if(!validator.isValidObjectId(req.query.userId)) {      
+      res.status(400).send({status: false, message: `${req.query.userId} is not a valid user id`})
+      return
+     }
+
+   }
+
+    if (!validator.isValid(req.query.category)) {
+      filterObject.category =req.query.category
+    }
+
+    if (!validator.isValid(req.query.subcategory)) {
+      filterObject.subcategory =req.query.subcategory
+    }
+
+   
+   
+    let search = await bookModel.find(filterObject).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 }).sort({title:1});
 
 
-    
+    if (search.length == 0) {
+       return res.status(404).send({ status: false, message:" no book with this combination found" })
+    }
+     
+    res.status(200).send({ status: true, message:"Book list", data:search}) 
 
+  
+  } catch (error) {
 
+    res.status(500).send({ status: false, error: error.message });
 
-
-
-  }
-  catch (error) {
-    console.log(error)
-    return res.status(500).send({ status: false, msg: error.message })
   }
 
 }
 
 
 
-
-const getbookbyId = async function (req, res) {
-  try {
-    let Id = req.params.bookId;
-
-    if (!validator.isValidObjectId(Id)) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "pls provide valid bookId" });
-    }
-
-    let findbook = await bookModel.findOne({ _id: Id, isDeleted: false }).select({__v:0,ISBN:0});
-    if (!findbook) {
-      return res.status(404).send({ status: false, msg: "book not present " })
-    }
-
-      const reviewsData = await reviewModel.find({ bookId: Id, isDeleted: false }).select({ createdAt: 0, updatedAt: 0, __v: 0 })
-      const data = { title, excerpt, userId, category, subcategory, isDeleted, reviews, deletedAt, releasedAt, createdAt, updatedAt, reviewsData }
-
-      data["reviews"] = data["reviewsData"].length
-      return res.status(200).send({ status: true, messege: "Book List", Data: data })
-
-    }
-    
-  
-  catch (error) {
-    console.log(error);
-    return res.status(500).send({ status: false, msg: error.message });
-  }
-};
 
 
 
