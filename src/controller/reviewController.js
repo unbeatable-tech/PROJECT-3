@@ -71,7 +71,7 @@ const reviewData = async function (req, res) {
 
         const saveReview = await reviewModel.create(requestBody)
         if (saveReview) {
-            await bookModel.findOneAndUpdate({ _id: Id }, { $inc: { review: 1 } })
+            await bookModel.findOneAndUpdate({ _id: Id }, { $inc: { reviews: 1 } })
         }
 
         const response = await reviewModel.findOne({ _id: saveReview._id }).select({ __v: 0, createdAt: 0, updatedAt: 0, isDeleted: 0 })
@@ -129,7 +129,7 @@ const updateReview = async function (req, res) {
             return res.status(404).send({ status: false, msg: `${bookParams} book is not present` })
         }
         const searchReview = await reviewModel.findOne({ _id: reviewParams, isDeleted: false })
-        if (!searchBook) {
+        if (!searchReview) {
             return res.status(404).send({ status: false, msg: `${reviewParams} review is not present` })
         }
         const updateReviewDetails = await reviewModel.findOneAndUpdate({ _id: reviewParams }, { review: review, rating: rating, reviewedBy: reviewedBy }, { new: true })

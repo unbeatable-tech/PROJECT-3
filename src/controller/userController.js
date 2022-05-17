@@ -15,7 +15,7 @@ const createUser = async function (req, res) {
           msg: "Invalid request parameters,please provide details",
         });
     }
-    const { title, name, email, phone, password} = user;
+    const { title, name, email, phone, password,address} = user;
     if (!title) {
       return res.status(400).send({ status: false, message: "pls add title" });
     }
