@@ -40,6 +40,28 @@ const createUser = async function (req, res) {
         .status(400)
         .send({ status: false, msg: "password is required" });
     }
+    if(!validator.validString(address)){
+      return res.status(400).send({ status: false, message: "Address cannot be empty if key is mentioned." })
+  };
+
+ 
+
+  //checking if the address key is present in the request body then it must have the following keys with their values, If not then address won't get stored in DB.
+  if (address) { 
+      
+      if(typeof(address) != 'object'){
+          return res.status(400).send({ status: false, message: "address must be in object." })
+      }
+      if (!validator.validString(address.street)) {
+          return res.status(400).send({ status: false, message: "Street address cannot be empty." })
+      }
+      if (!validator.validString(address.city)) {
+          return res.status(400).send({ status: false, message: "City cannot be empty." })
+      }
+      if (!validator.validString(address.pincode)) {
+          return res.status(400).send({ status: false, message: "Pincode cannot be empty." })
+      }
+  }
 
     const sameEmail = await userModel.findOne({ email: email });
     if (sameEmail) {
@@ -87,8 +109,8 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "Password criteria not fulfilled." });
     }
 
-    let data = req.body;
-    let save = await userModel.create(data);
+ 
+    let save = await userModel.create(user);
     res.status(201).send({ status: true, data: save });
   } 
   catch (error) {
@@ -127,11 +149,11 @@ const userLogin = async function (req, res) {
       let save = await userModel.findOne({ email: email, password: password });
       if (save) {
         let token = jwt.sign({ userId: save._id }, "project3group6", {
-          expiresIn: "10h",
+          expiresIn: "2hr",
         });
         res.header("x-api-key", token);
         return res
-          .status(201)
+          .status(200)
           .send({
             status: true,
             message: "you have successfully logged in",
